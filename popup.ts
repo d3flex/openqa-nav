@@ -49,7 +49,7 @@ function displayTabs(tabs: chrome.tabs.Tab[]): void {
     h1Elem.textContent = 'No OpenQA tabs found';
     return;
   }
-
+  //chrome.action.setBadgeText({ text: tabs.length.toString() });
   tabList.innerHTML = '';
   
   tabs.forEach(tab => {

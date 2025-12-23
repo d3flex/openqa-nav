@@ -18,6 +18,9 @@
       "js": ["popup.js"]
     }
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "commands": {
     "next-job": {
       "suggested_key": {
