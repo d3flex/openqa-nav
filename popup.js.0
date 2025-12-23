@@ -1,0 +1,70 @@
+"use strict";
+async function getOpenQATabs() {
+    const tabs = await chrome.tabs.query({});
+    const openqaTabs = tabs.filter(tab => {
+        return tab.url && tab.url.includes('/openqa');
+    });
+    return openqaTabs;
+}
+function addUrlTab(elem) {
+    /** Operate on single Element to create and add a tab in
+     * the list after the title Elem
+     */
+    const tabUrl = document.createElement('div');
+    tabUrl.className = 'tab-url';
+    const elemUrlVar = elem.url || 'Untitled';
+    tabUrl.textContent = elemUrlVar;
+    tabUrl.setAttribute('title', elemUrlVar);
+    const tabUrlReloadIco = document.createElement('i');
+    tabUrlReloadIco.className = 'fa-solid fa-rotate-right';
+    tabUrlReloadIco.innerHTML = "&#8635;";
+    tabUrl.appendChild(tabUrlReloadIco);
+    tabUrlReloadIco.addEventListener('click', () => {
+        if (elem.id !== undefined) {
+            chrome.tabs.reload(elem.id);
+        }
+    });
+    const tabUrlCloseIco = document.createElement('i');
+    tabUrlCloseIco.className = 'fa-solid fa-xmark';
+    tabUrlCloseIco.innerHTML = "&times;";
+    tabUrl.appendChild(tabUrlCloseIco);
+    tabUrlCloseIco.addEventListener('click', () => {
+        if (elem.id !== undefined) {
+            chrome.tabs.remove(elem.id);
+        }
+    });
+    return tabUrl;
+}
+function displayTabs(tabs) {
+    const tabList = document.getElementById('tab-list');
+    const h1Elem = document.querySelector('h1');
+    h1Elem.textContent = `Found ${tabs.length} OpenQA tab${tabs.length !== 1 ? 's' : ''}`;
+    if (tabs.length === 0) {
+        h1Elem.textContent = 'No OpenQA tabs found';
+        return;
+    }
+    tabList.innerHTML = '';
+    tabs.forEach(tab => {
+        const tabItem = document.createElement('div');
+        tabItem.className = 'tab-item';
+        const tabTitle = document.createElement('div');
+        tabTitle.className = 'tab-title';
+        tabTitle.textContent = tab.title || 'Untitled';
+        const tabUrl = addUrlTab(tab);
+        tabItem.appendChild(tabTitle);
+        tabItem.appendChild(tabUrl);
+        tabItem.addEventListener('click', () => {
+            if (tab.id !== undefined) {
+                chrome.tabs.update(tab.id, { active: true });
+            }
+            if (tab.windowId !== undefined) {
+                chrome.windows.update(tab.windowId, { focused: true });
+            }
+        });
+        tabList.appendChild(tabItem);
+    });
+}
+document.addEventListener('DOMContentLoaded', async () => {
+    const tabs = await getOpenQATabs();
+    displayTabs(tabs);
+});

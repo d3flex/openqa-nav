@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "chrome-types": "^0.1.401"
+    "chrome-types": "^0.1.401",
+    "typescript": "^5.9.3"
   }
 }
