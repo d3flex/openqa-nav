@@ -1,13 +1,3 @@
-async function getOpenQATabs(): Promise<chrome.tabs.Tab[]> {
-  const tabs: chrome.tabs.Tab[] = await chrome.tabs.query({});
-
-  const openqaTabs: chrome.tabs.Tab[] = tabs.filter(tab => {
-    return tab.url && tab.url.includes('/openqa');
-  });
-
-  return openqaTabs;
-}
-
 function addUrlTab(elem: chrome.tabs.Tab): HTMLDivElement {
   /** Operate on single Element to create and add a tab in
    * the list after the title Elem
@@ -50,6 +40,7 @@ function displayTabs(tabs: chrome.tabs.Tab[]): void {
     return;
   }
   //chrome.action.setBadgeText({ text: tabs.length.toString() });
+
   tabList.innerHTML = '';
   
   tabs.forEach(tab => {
@@ -78,6 +69,17 @@ function displayTabs(tabs: chrome.tabs.Tab[]): void {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const tabs = await getOpenQATabs();
-  displayTabs(tabs);
+  console.log('[Popup] DOM loaded, sending message to background');
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'getOpenQATabs' });
+    console.log('[Popup] Received response:', response);
+    if (response && response.tabs) {
+      console.log('[Popup] Displaying', response.tabs.length, 'tabs');
+      displayTabs(response.tabs);
+    } else {
+      console.error('[Popup] No tabs received from background');
+    }
+  } catch (error) {
+    console.error('[Popup] Error fetching tabs:', error);
+  }
 });

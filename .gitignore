@@ -21,3 +21,4 @@ yarn-error.log*
 # Compiled JavaScript from TypeScript
 popup.js
 background.js
+utils.js
